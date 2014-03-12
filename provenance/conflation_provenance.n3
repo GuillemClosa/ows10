@@ -1,0 +1,451 @@
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+
+@prefix ows: <http://www.opengis.net/ogc/ows/ows-core-ontology/> .
+# Dataset namespaces
+# <http://www.opengis.net/ogc/ows10/usgs_dataset/> is a generic URL. Please use a URL that represents the USGS dataset instead.
+@prefix usgs: <http://www.opengis.net/ogc/ows10/usgs_dataset/> .
+# <http://www.opengis.net/ogc/ows10/osm_dataset/> is a generic URL. Please use a URL that represents the OSM dataset instead.
+@prefix osm: <http://www.opengis.net/ogc/ows10/osm_dataset/> .
+# <http://www.opengis.net/ogc/usgs_conf-dataset/> is a generic URL. Please use a URL that represents the OSM dataset instead.
+@prefix usgs_conf: <http://www.opengis.net/ogc/usgs_conf-dataset/> . 
+
+@prefix ows10: <http://www.opengis.net/ogc/ows10/ows10-core-ontology/> .
+@prefix f2n: <http://www.opengis.net/ogc/ows10/ows10-f2n-ontology/> .
+@prefix wenwen: <http://www.opengis.net/ogc/ows10/ows10-wenwen-ontology/> .
+@prefix nga: <http://www.opengis.net/ogc/ows10/ows10-nga-ontology/> .
+
+
+###################################################################
+#                           OGC types
+###################################################################
+
+# This layer contains all ogc types for WPS services, and for features
+
+# FeatureCollection
+# http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-collection
+ows:FeatureCollection rdfs:subClassOf prov:collection .
+
+# Feature
+ows:Feature rdfs:subClassOf prov:Entity .
+
+# Geometries
+ows:Geometry rdfs:subClassOf prov:Entity .
+# Geometry
+ows:Point rdfs:subClassOf ows:Geometry .
+ows:Line rdfs:subClassOf ows:Geometry .
+ows:Polygon rdfs:subClassOf ows:Geometry .
+
+# Non Geometrical Property
+ows:Property rdfs:subClassOf prov:Entity .
+
+ows:hadGeometry a owl:ObjectProperty ;
+    rdfs:comment "A geometric property of a resource" ;
+    rdfs:domain ows:Feature;
+    rdfs:isDefinedBy <http://www.opengis.net/ogc/ows/ows-core-ontology/> ;
+    rdfs:label "hasGeometry" ;
+    rdfs:range ows:Geometry .
+
+ows:hadProperty a owl:ObjectProperty ;
+    rdfs:comment "A Non geometric property of a resource" ;
+    rdfs:domain ows:Feature;
+    rdfs:isDefinedBy <http://www.opengis.net/ogc/ows/ows-core-ontology/> ;
+    rdfs:label "hasProperty" ;
+    rdfs:range ows:Property .
+
+# WPSExectution (a execution of an individual process in a WPS service) as a subclass of PROV Activity	.
+ows:WPSExecution rdfs:SubclassOf prov:Activity .
+
+# A WPS parameter that is not a feature or a feature collection
+ows:WPSParameter  rdfs:subclassOf prov:Entity .
+
+
+# Generic Roles
+ows:ProcessInput rdfs:subclassOf prov:Role .
+ows:ProcessOutput rdfs:subclassOf prov:Role .
+ows:client rdfs:subclassOf prov:Role .
+ows:developer rdfs:subclassOf prov:Role .
+
+# A WPS service is a plan collection
+ows:WPSService  rdfs:subclassOf prov:Plan .
+
+# A WPS service is a plan (the capability of doing something)
+ows:WPSProcess  rdfs:subclassOf prov:Plan .
+
+
+###################################################################
+#     FeatureCollections ("Datasets") involved in the conflation process
+###################################################################
+
+# The two OWS-10 data sources defined as instances of PROV Collection 
+
+#owl:sameAs is decribed here: <http://xmlns.com/foaf/spec/>
+
+usgs:USGSMap a ows:FeatureCollection;
+		  owl:sameAs <http://portal.cubewerx.com/cubewerx/projects/ows9/cubeserv.cgi?service=WFS&amp;datastore=OWS9&amp;request=GetFeature&amp;typename=usgs:fireStationEmsStation>.
+osm:OSMMap a ows:FeatureCollection;
+		  owl:sameAs <http://services.interactive-instruments.de/xsprojects/ows10/service/tds-dgiwg/wfs/...>.
+
+# The conflated map is a class, subclass of PROV Collection
+usgs_conf:ConflatedMap a ows:FeatureCollection .
+
+# A new conflated map instance is a revision of a previously generated one
+usgs_conf:ConflatedMap prov:wasRevisionOf usgs:USGSMap .
+
+usgs_conf:ConflatedMap prov:generatedAtTime "2014-03-05T10:20:05"^^xsd:dateTime .
+
+
+
+###################################################################
+#     FeatureTypes involved in the conflation process
+###################################################################
+usgs:USGS_Feature rdfs:subClassOf ows:Feature .
+osm:USGS_Feature rdfs:subClassOf ows:Feature .
+
+###################################################################
+#     AttributeTypes involved in the conflation process
+###################################################################
+usgs:USGS_Position rdfs:subClassOf ows:Line .
+osm:OSM_Position rdfs:subClassOf ows:Line .
+usgs:USGS_Address rdfs:subClassOf ows:Property .
+osm:OSM_Address rdfs:subClassOf ows:Property .
+
+###################################################################
+#                WPS generic Executions in ows10
+###################################################################
+
+# WPSConflationProcess as a subclass of WPSProcess.
+# This is intruducing the idea of "WPS profiles"
+ows10:WPSConflationExecution rdfs:SubclassOf ows:WPSExecution .
+
+# 52N_WPSConflationProcess (the implementation of 52North) as a subclass of ows10:WPSConflationProcess.
+f2n:52N_WPSConflationProcess rdfs:SubclassOf ows10:WPSConflationExecution .
+
+wenwen:WenWen_WPSConflationExecution rdfs:SubclassOf ows10:WPSConflationExecution .
+
+###################################################################
+#               Other parameters used in the execution
+###################################################################
+
+ows10:Distance rdfs:subClassOf ows:WPSParameter .
+
+
+###################################################################
+#                   Roles in ows10
+###################################################################
+
+ows10:ConflationProcessInput rdfs:subclassOf ows:ProcessInput .
+
+ows10:referenceMapSource     a ows10:conflationProcessInput .
+ows10:crowdsourcedMapSource  a ows10:conflationProcessInput .
+ows10:ConflationThreshold    a ows10:conflationProcessInput .
+ows10:ConflatedMapOutput a ows:ProcessOutput .
+
+###################################################################
+#                    People from 52 north
+###################################################################
+
+# 52north and its affiliates (benjamin) are agents associated with the 52N conflation execution
+f2n:52north a prov:Agent ;
+             a prov:Organization ;
+             foaf:name "52°North Initiative for Geospatial Open Source Software GmbH" .
+
+
+# f2n:benjamin is the developer 
+f2n:benjamin a prov:Agent ;
+            a prov:Person ;
+            foaf:givenName "Benjamin Pross"^^xsd:string ;
+            foaf:mbox      <mailto:b.pross@52north.org> .
+
+f2n:benjamin prov:actedOnBehalfOf f2n:52north .
+
+#Role of Benjamin as developer
+f2n:BenjaminDeveloper	     a ows:developer .
+
+###################################################################
+#                    People from NGA
+###################################################################
+
+# NGA and its affiliates (david) are agents associated with the execution of a 52N conflation processes and the creation of conflated map
+
+nga:NGA a prov:Agent ;
+              a prov:Organization ;
+              foaf:name "National Geospatial Agency OWS-10 contribution" .
+
+# f2n:david is the operator of the process execution
+nga:david a prov:Agent ;
+			  a prov:Person ;
+              foaf:givenName "David Weslow"^^xsd:string ;
+              foaf:mbox      <mailto:david.weslow@nga.mil> .
+
+nga:david prov:actedOnBehalfOf nga:NGA .
+
+#Role of David as client
+nga:davidClient		     a ows10:client .
+
+###################################################################
+#     Individual feature properties of the source "datasets"
+###################################################################
+
+usgs:USGS_Position1 a usgs:USGS_Position .
+usgs:USGS_Position2 a usgs:USGS_Position .
+usgs:USGS_Address1 a usgs:USGS_Address .
+usgs:USGS_Address2 a usgs:USGS_Address .
+usgs:OSM_Position1 a osm:OSM_Position .
+usgs:OSM_Position2 a osm:OSM_Position .
+osm:OSM_Address1 a osm:OSM_Address .
+osm:OSM_Address2 a osm:OSM_Address .
+usgs_conf:ConflatedMap_Position1 a usgs:USGS_Position .
+usgs_conf:ConflatedMap_Position2 a usgs:USGS_Position .
+usgs_conf:ConflatedMap_Address1 a usgs:USGS_Address .
+usgs_conf:ConflatedMap_Address2 a usgs:USGS_Address .
+
+###################################################################
+#     Individual features of the source "datasets"
+###################################################################
+
+# USGS_Feature1, ... are just generic names. Please use the gml:id values as names usgs namespace
+
+usgs:USGS_Feature1 a usgs:USGS_Feature;
+                      ows:hadGeometry usgs:USGS_Position1;
+		      ows:hadProperty usgs:USGS_Address1 .
+usgs:USGS_Feature2 a usgs:USGS_Feature;
+		      ows:hadGeometry usgs:USGS_Position2;
+                      ows:hadProperty usgs:USGS_Address2 .
+# ...3, 4, 5...
+
+# OSM_Feature1, ... are just generic names. Please use the gml:id values as names usgs namespace
+osm:OSM_Feature1 a osm:OSM_Feature;
+                      ows:hadGeometry usgs:OSM_Position1;
+		      ows:hadProperty osm:OSM_Address1 .
+osm:OSM_Feature2 a osm:OSM_Feature;
+                      ows:hadGeometry osm:OSM_Position2;
+		      ows:hadProperty osm:OSM_Address2 .
+# ...3, 4, 5...
+
+# The two OWS-10 data sources are formed by member entities 
+# http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-membership
+usgs:USGSMap prov:hadMember usgs:USGS_Feature1;
+              prov:hadMember usgs:USGS_Feature2 .
+# ... 3, 4, 5...
+
+osm:OSMMap prov:hadMember osm:OSM_Feature1;
+              prov:hadMember osm:OSM_Feature2 .
+# ... 3, 4, 5...
+
+# Please not that the confation results are defined as usgs:USGS_Feature type deliverately.
+# this besause the conflate results has the same data structure than the USGS dataset.
+usgs_conf:ConflatedMap_Feature1 a usgs:USGS_Feature;
+                      ows:hadGeometry usgs_conf:ConflatedMap_Position1;
+		      ows:hadProperty usgs_conf:ConflatedMap_Address1 .
+usgs_conf:ConflatedMap_Feature2 a usgs:USGS_Feature;
+                      ows:hadGeometry usgs_conf:ConflatedMap_Position2;
+		      ows:hadProperty usgs_conf:ConflatedMap_Address2 .
+# ... 3, 4, 5...
+
+usgs_conf:ConflatedMap prov:hadMember usgs_conf:ConflatedMap_Feature1;
+                   prov:hadMember usgs_conf:ConflatedMap_Feature2 .
+# ... 3, 4, 5...
+
+###################################################################
+#     How Individual conflated features relate to sources
+###################################################################
+
+# This are just examples of diferent posibilities that Features can be inhereted or created
+
+# If the feature was not affected by the conflation execution
+usgs_conf:ConflatedMap_Feature1 owl:sameAs usgs:USGS_Feature1 .
+
+# If the feature was revised by the conflation execution
+usgs_conf:ConflatedMap_Feature2 prov:wasRevisionOf usgs:USGS_Feature2 .
+
+# If the feature was created from a OSM feature
+usgs_conf:ConflatedMap_Feature2 prov:wasDerivedFrom osm:OSM_Feature2 .
+#... 3, 4, 5...
+
+###################################################################
+#     How Individual conflated feature geometries relate to sources
+###################################################################
+
+# This are just examples of diferent posibilities that Geometries can be inhereted or created
+
+# If the geometry was not affected by the conflation execution
+usgs_conf:ConflatedMap_Geometry1 owl:sameAs usgs:USGS_Geometry1 .
+
+# If the geometry was revised by the conflation execution
+usgs_conf:ConflatedMap_Geometry2 prov:wasRevisionOf usgs:USGS_Geometry2 .
+
+# If the geometry was created from a OSM feature
+usgs_conf:ConflatedMap_Geometry2 prov:wasDerivedFrom osm:OSM_Geometry2 .
+#... 3, 4, 5...
+
+###################################################################
+#     How Individual conflated feature NON geometrical properties relate to sources
+###################################################################
+
+# This are just examples of diferent posibilities that NON geometrical properties can be inhereted or created
+
+# If the NON geometrical property was not affected by the conflation execution
+usgs_conf:ConflatedMap_Address1 owl:sameAs usgs:USGS_Address1 .
+
+# If the NON geometrical property was revised by the conflation execution
+usgs_conf:ConflatedMap_Address2 prov:wasRevisionOf usgs:USGS_Address2 .
+
+# If the NON geometrical property was created from a OSM feature
+usgs_conf:ConflatedMap_Address2 prov:wasDerivedFrom osm:OSM_Address2 .
+#... 3, 4, 5...
+
+###################################################################
+#               Other parameters used in the execution
+###################################################################
+
+# The threshold distance is an example of parameter.
+ows10:Distance1 a ows10:Distance;
+		prov:value 10 .
+
+f2n:52N_ConflationExecution20140305 prov:used ows10:Distance1 .
+
+f2n:52N_ConflationExecution20140305 prov:qualifiedUsage [
+                  a prov:Usage ;
+                  prov:entity  ows10:Distance1 ;
+                  prov:hadRole ows10:ConflationThreshold
+     ] .
+
+###################################################################
+#                     Individual execution
+###################################################################
+
+## Operation 1 runs conflation processes instance number 20140305 (we use the date as an identifier).
+f2n:52N_ConflationExecution20140305  a f2n:52N_WPSConflationExecution .
+
+# The indivitual execution uses a plan
+f2n:52N_ConflationExecution20140305  prov:used  f2n:52N_ConflationAlgorithm_v1 .
+
+f2n:52N_ConflationExecution20140305  prov:startedAtTime "2014-03-03T08:10:00"^^xsd:dateTime ;
+               prov:endedAtTime   "2014-03-05T10:20:00"^^xsd:dateTime .
+
+###################################################################
+#    Relations between individual features and individual executions
+###################################################################
+
+# Usage and Generation relations between entities and activities
+# Each conflation process instance uses the two OWS-10 data sources 
+f2n:52N_ConflationExecution20140305   prov:used  usgs:USGS_Feature1;
+                                      prov:used  usgs:USGS_Feature2;
+                                      prov:used  osm:OSM_Feature1;
+                                      prov:used  osm:OSM_Feature2 .
+
+# When a conflation process is run, a conflated map instance is generated by the process
+usgs_conf:ConflatedMap_Feature1  prov:wasGeneratedBy f2n:52N_ConflationExecution20140305 .
+usgs_conf:ConflatedMap_Feature2  prov:wasGeneratedBy f2n:52N_ConflationExecution20140305 .
+#...
+
+# The provenance of conflated maps and conflation processes can include time stamps
+usgs_conf:ConflatedMap_Feature1; prov:generatedAtTime "2014-03-05T10:20:00"^^xsd:dateTime .
+usgs_conf:ConflatedMap_Feature2; prov:generatedAtTime "2014-03-05T10:20:05"^^xsd:dateTime .
+#...
+
+###################################################################
+#    Attribution the execution (who pressed the button it?)
+###################################################################
+
+usgs_conf:ConflatedMap prov:wasAttributedTo nga:david . 
+usgs_conf:ConflatedMap_Feature1 prov:wasAttributedTo nga:david . 
+usgs_conf:ConflatedMap_Feature2 prov:wasAttributedTo nga:david . 
+#... 3, 4, 5...
+
+f2n:52N_ConflationExecution20140305 prov:wasAssociatedWith nga:david .
+
+###################################################################
+#    Roles for individual executions and features.
+###################################################################
+# Entities and agents have specific roles in conflation processes
+
+f2n:52N_ConflationExecution20140305 prov:qualifiedUsage [
+                  a prov:Usage ;
+                  prov:entity  osm:OSM_Feature1 ;
+                  prov:hadRole ows10:crowdsourcedMapSource
+     ] .
+
+f2n:52N_ConflationExecution20140305 prov:qualifiedUsage [
+                  a prov:Usage ;
+                  prov:entity  usgs:USGS_Feature1 ;
+                  prov:hadRole ows10:ReferencedMapSource
+     ] .
+
+f2n:52N_ConflationExecution20140305 prov:qualifiedUsage [
+                  a prov:Usage ;
+                  prov:entity  osm:OSM_Feature2 ;
+                  prov:hadRole ows10:crowdsourcedMapSource
+     ] .
+
+f2n:52N_ConflationExecution20140305 prov:qualifiedUsage [
+                  a prov:Usage ;
+                  prov:entity  usgs:USGS_Feature2 ;
+                  prov:hadRole ows10:ReferencedMapSource
+     ] .
+#... 3, 4, 5...
+
+usgs_conf:ConflatedMap_Feature1 prov:qualifiedGeneration [
+                     a prov:Generation ;
+                     prov:activity  f2n:52N_ConflationExecution20140305 ;
+                     prov:hadRole   ows10:ConflatedMapOutput
+  ] .
+
+usgs_conf:ConflatedMap_Feature2 prov:qualifiedGeneration [
+                     a prov:Generation ;
+                     prov:activity  f2n:52N_ConflationExecution20140305 ;
+                     prov:hadRole   ows10:ConflatedMapOutput
+  ] .
+
+#... 3, 4, 5...
+
+##################################################################
+#                   The Process Service and Operation (Plan)
+###################################################################
+
+f2n:52N_WPSService  a ows:WPSService;
+		      a prov:collection;
+			owl:sameAs <http://ows.dev.52north.org:8080/wps/WebProcessingService?service=wps&request=getcapabilities&version=1.0.0> .
+
+# The conflation process implements an algorithm, defined as a subclass of PROV Plan
+
+ows10:ConflationAlgorithm  rdfs:subclassOf ows:WPSProcess .
+
+# 52N uses a particular conflation algorithm
+f2n:52N_ConflationAlgorithm rdfs:subclassOf ows10:ConflationAlgorithm .
+
+f2n:52N_ConflationAlgorithm_v1 a f2n:52N_ConflationAlgorithm ;
+				prov:generatedAtTime "2014-03-05T12:00:00"^^xsd:dateTime ;
+				owl:sameAs <http://ows.dev.52north.org:8080/wps/WebProcessingService?service=wps&version=1.0.0&request=DescribeProcess&Identifier=Conflation> .
+
+f2n:52N_WPSService prov:hadMember f2n:52N_ConflationAlgorithm_v1 .
+	
+# The 52N conflation algorithm can have different versions over time, each defined as an instance of the algorithm and therefore as an instance of PROV Plan 
+
+###################################################################
+#              Attribution the process (who did it?)
+###################################################################
+
+f2n:52N_ConflationAlgorithm_v1 prov:wasAttributedTo f2n:benjamin .
+
+f2n:52N_ConflationAlgorithm_v1 prov:qualifiedAttribution [
+						a  prov:Attribution ;
+						   prov:agent    f2n:benjamin ;
+						   prov:hadRole  f2n:BenjaminDeveloper ;
+  ] .
+
+
+###################################################################
+#                            Bundle
+###################################################################
+
+
+# The provenance of the provenance can also be expressed by defining a bundle at the beginning of a file as follows: 
+
+<> a prov:Bundle;
+        prov:wasAttributedTo f2n:Arne ;
+            prov:wasGeneratedAt "2014-03-05T10:22:00"^^xsd:dateTime .
