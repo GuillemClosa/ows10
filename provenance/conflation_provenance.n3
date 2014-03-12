@@ -66,13 +66,13 @@ ows:WPSParameter  rdfs:subclassOf prov:Entity .
 # Generic Roles
 ows:ProcessInput rdfs:subclassOf prov:Role .
 ows:ProcessOutput rdfs:subclassOf prov:Role .
-ows:client rdfs:subclassOf prov:Role .
-ows:developer rdfs:subclassOf prov:Role .
+ows:Client rdfs:subclassOf prov:Role .
+ows:Developer rdfs:subclassOf prov:Role .
 
-# A WPS service is a plan collection
+# A WPS service is a plan collection  
 ows:WPSService  rdfs:subclassOf prov:Plan .
 
-# A WPS service is a plan (the capability of doing something)
+# A WPS process is a plan (the capability of doing something)
 ows:WPSProcess  rdfs:subclassOf prov:Plan .
 
 
@@ -90,12 +90,12 @@ osm:OSMMap a ows:FeatureCollection;
 		  owl:sameAs <http://services.interactive-instruments.de/xsprojects/ows10/service/tds-dgiwg/wfs/...>.
 
 # The conflated map is a class, subclass of PROV Collection
-usgs_conf:ConflatedMap a ows:FeatureCollection .
+usgs_conf:conflatedMap a ows:FeatureCollection .
 
 # A new conflated map instance is a revision of a previously generated one
-usgs_conf:ConflatedMap prov:wasRevisionOf usgs:USGSMap .
+usgs_conf:conflatedMap prov:wasRevisionOf usgs:USGSMap .
 
-usgs_conf:ConflatedMap prov:generatedAtTime "2014-03-05T10:20:05"^^xsd:dateTime .
+usgs_conf:conflatedMap prov:generatedAtTime "2014-03-05T10:20:05"^^xsd:dateTime .
 
 
 
@@ -117,12 +117,11 @@ osm:OSM_Address rdfs:subClassOf ows:Property .
 #                WPS generic Executions in ows10
 ###################################################################
 
-# WPSConflationProcess as a subclass of WPSProcess.
 # This is intruducing the idea of "WPS profiles"
 ows10:WPSConflationExecution rdfs:SubclassOf ows:WPSExecution .
 
-# 52N_WPSConflationProcess (the implementation of 52North) as a subclass of ows10:WPSConflationProcess.
-f2n:52N_WPSConflationProcess rdfs:SubclassOf ows10:WPSConflationExecution .
+# 52N_WPSConflationExecution (the implementation of 52North) as a subclass of ows10:WPSConflationExecution
+f2n:52N_WPSConflationExecution rdfs:SubclassOf ows10:WPSConflationExecution .
 
 wenwen:WenWen_WPSConflationExecution rdfs:SubclassOf ows10:WPSConflationExecution .
 
@@ -138,11 +137,12 @@ ows10:Distance rdfs:subClassOf ows:WPSParameter .
 ###################################################################
 
 ows10:ConflationProcessInput rdfs:subclassOf ows:ProcessInput .
+ows10:ConflationProcessOutput rdfs:subclassOf ows:ProcessInput .
 
-ows10:referenceMapSource     a ows10:conflationProcessInput .
-ows10:crowdsourcedMapSource  a ows10:conflationProcessInput .
-ows10:ConflationThreshold    a ows10:conflationProcessInput .
-ows10:ConflatedMapOutput a ows:ProcessOutput .
+ows10:referenceMapSource     a ows10:ConflationProcessInput .
+ows10:crowdsourcedMapSource  a ows10:ConflationProcessInput .
+ows10:conflationThreshold    a ows10:ConflationProcessInput .
+ows10:conflatedMapOutput     a ows10:ConflationProcessOutput .
 
 ###################################################################
 #                    People from 52 north
@@ -151,7 +151,7 @@ ows10:ConflatedMapOutput a ows:ProcessOutput .
 # 52north and its affiliates (benjamin) are agents associated with the 52N conflation execution
 f2n:52north a prov:Agent ;
              a prov:Organization ;
-             foaf:name "52°North Initiative for Geospatial Open Source Software GmbH" .
+             foaf:name "52Â°North Initiative for Geospatial Open Source Software GmbH" .
 
 
 # f2n:benjamin is the developer 
@@ -163,7 +163,7 @@ f2n:benjamin a prov:Agent ;
 f2n:benjamin prov:actedOnBehalfOf f2n:52north .
 
 #Role of Benjamin as developer
-f2n:BenjaminDeveloper	     a ows:developer .
+f2n:benjaminDeveloper	     a ows:Developer .
 
 ###################################################################
 #                    People from NGA
@@ -183,8 +183,8 @@ nga:david a prov:Agent ;
 
 nga:david prov:actedOnBehalfOf nga:NGA .
 
-#Role of David as client
-nga:davidClient		     a ows10:client .
+#Role of David as Client
+nga:davidClient		     a ows:Client .
 
 ###################################################################
 #     Individual feature properties of the source "datasets"
@@ -198,10 +198,10 @@ usgs:OSM_Position1 a osm:OSM_Position .
 usgs:OSM_Position2 a osm:OSM_Position .
 osm:OSM_Address1 a osm:OSM_Address .
 osm:OSM_Address2 a osm:OSM_Address .
-usgs_conf:ConflatedMap_Position1 a usgs:USGS_Position .
-usgs_conf:ConflatedMap_Position2 a usgs:USGS_Position .
-usgs_conf:ConflatedMap_Address1 a usgs:USGS_Address .
-usgs_conf:ConflatedMap_Address2 a usgs:USGS_Address .
+usgs_conf:conflated_Position1 a usgs:USGS_Position .
+usgs_conf:conflated_Position2 a usgs:USGS_Position .
+usgs_conf:conflated_Address1 a usgs:USGS_Address .
+usgs_conf:conflated_Address2 a usgs:USGS_Address .
 
 ###################################################################
 #     Individual features of the source "datasets"
@@ -236,18 +236,18 @@ osm:OSMMap prov:hadMember osm:OSM_Feature1;
               prov:hadMember osm:OSM_Feature2 .
 # ... 3, 4, 5...
 
-# Please not that the confation results are defined as usgs:USGS_Feature type deliverately.
-# this besause the conflate results has the same data structure than the USGS dataset.
-usgs_conf:ConflatedMap_Feature1 a usgs:USGS_Feature;
-                      ows:hadGeometry usgs_conf:ConflatedMap_Position1;
-		      ows:hadProperty usgs_conf:ConflatedMap_Address1 .
-usgs_conf:ConflatedMap_Feature2 a usgs:USGS_Feature;
-                      ows:hadGeometry usgs_conf:ConflatedMap_Position2;
-		      ows:hadProperty usgs_conf:ConflatedMap_Address2 .
+# Please note that the confation results are defined as usgs:USGS_Feature type deliverately.
+# this because the conflate results has the same data structure than the USGS dataset.
+usgs_conf:conflated_Feature1 a usgs:USGS_Feature;
+                      ows:hadGeometry usgs_conf:conflated_Position1;
+		      ows:hadProperty usgs_conf:conflated_Address1 . 
+usgs_conf:conflated_Feature2 a usgs:USGS_Feature;
+                      ows:hadGeometry usgs_conf:conflated_Position2;
+		      ows:hadProperty usgs_conf:conflated_Address2 .
 # ... 3, 4, 5...
 
-usgs_conf:ConflatedMap prov:hadMember usgs_conf:ConflatedMap_Feature1;
-                   prov:hadMember usgs_conf:ConflatedMap_Feature2 .
+usgs_conf:conflatedMap prov:hadMember usgs_conf:conflated_Feature1;
+                   prov:hadMember usgs_conf:conflated_Feature2 .
 # ... 3, 4, 5...
 
 ###################################################################
@@ -257,13 +257,13 @@ usgs_conf:ConflatedMap prov:hadMember usgs_conf:ConflatedMap_Feature1;
 # This are just examples of diferent posibilities that Features can be inhereted or created
 
 # If the feature was not affected by the conflation execution
-usgs_conf:ConflatedMap_Feature1 owl:sameAs usgs:USGS_Feature1 .
+usgs_conf:conflated_Feature1 owl:sameAs usgs:USGS_Feature1 .
 
 # If the feature was revised by the conflation execution
-usgs_conf:ConflatedMap_Feature2 prov:wasRevisionOf usgs:USGS_Feature2 .
+usgs_conf:conflated_Feature2 prov:wasRevisionOf usgs:USGS_Feature2 .
 
 # If the feature was created from a OSM feature
-usgs_conf:ConflatedMap_Feature2 prov:wasDerivedFrom osm:OSM_Feature2 .
+usgs_conf:conflated_Feature2 prov:wasDerivedFrom osm:OSM_Feature2 .
 #... 3, 4, 5...
 
 ###################################################################
@@ -273,13 +273,13 @@ usgs_conf:ConflatedMap_Feature2 prov:wasDerivedFrom osm:OSM_Feature2 .
 # This are just examples of diferent posibilities that Geometries can be inhereted or created
 
 # If the geometry was not affected by the conflation execution
-usgs_conf:ConflatedMap_Geometry1 owl:sameAs usgs:USGS_Geometry1 .
+usgs_conf:conflated_Position1 owl:sameAs usgs:USGS_Geometry1 .
 
 # If the geometry was revised by the conflation execution
-usgs_conf:ConflatedMap_Geometry2 prov:wasRevisionOf usgs:USGS_Geometry2 .
+usgs_conf:conflated_Position2 prov:wasRevisionOf usgs:USGS_Geometry2 .
 
 # If the geometry was created from a OSM feature
-usgs_conf:ConflatedMap_Geometry2 prov:wasDerivedFrom osm:OSM_Geometry2 .
+usgs_conf:conflated_Position2 prov:wasDerivedFrom osm:OSM_Geometry2 .
 #... 3, 4, 5...
 
 ###################################################################
@@ -289,13 +289,13 @@ usgs_conf:ConflatedMap_Geometry2 prov:wasDerivedFrom osm:OSM_Geometry2 .
 # This are just examples of diferent posibilities that NON geometrical properties can be inhereted or created
 
 # If the NON geometrical property was not affected by the conflation execution
-usgs_conf:ConflatedMap_Address1 owl:sameAs usgs:USGS_Address1 .
+usgs_conf:conflated_Address1 owl:sameAs usgs:USGS_Address1 .
 
 # If the NON geometrical property was revised by the conflation execution
-usgs_conf:ConflatedMap_Address2 prov:wasRevisionOf usgs:USGS_Address2 .
+usgs_conf:conflated_Address2 prov:wasRevisionOf usgs:USGS_Address2 .
 
 # If the NON geometrical property was created from a OSM feature
-usgs_conf:ConflatedMap_Address2 prov:wasDerivedFrom osm:OSM_Address2 .
+usgs_conf:conflated_Address2 prov:wasDerivedFrom osm:OSM_Address2 .
 #... 3, 4, 5...
 
 ###################################################################
@@ -303,15 +303,15 @@ usgs_conf:ConflatedMap_Address2 prov:wasDerivedFrom osm:OSM_Address2 .
 ###################################################################
 
 # The threshold distance is an example of parameter.
-ows10:Distance1 a ows10:Distance;
+ows10:distance1 a ows10:Distance;
 		prov:value 10 .
 
-f2n:52N_ConflationExecution20140305 prov:used ows10:Distance1 .
+f2n:52N_ConflationExecution20140305 prov:used ows10:distance1 .
 
 f2n:52N_ConflationExecution20140305 prov:qualifiedUsage [
                   a prov:Usage ;
-                  prov:entity  ows10:Distance1 ;
-                  prov:hadRole ows10:ConflationThreshold
+                  prov:entity  ows10:distance1 ;
+                  prov:hadRole ows10:conflationThreshold
      ] .
 
 ###################################################################
@@ -323,6 +323,12 @@ f2n:52N_ConflationExecution20140305  a f2n:52N_WPSConflationExecution .
 
 # The indivitual execution uses a plan
 f2n:52N_ConflationExecution20140305  prov:used  f2n:52N_ConflationAlgorithm_v1 .
+
+f2n:52N_ConflationExecution20140305 prov:qualifiedUsage [
+                  a prov:Usage ;
+                  prov:Plan  f2n:52N_ConflationAlgorithm_v1 ;
+                  prov:hadRole nga:davidClient
+     ] .
 
 f2n:52N_ConflationExecution20140305  prov:startedAtTime "2014-03-03T08:10:00"^^xsd:dateTime ;
                prov:endedAtTime   "2014-03-05T10:20:00"^^xsd:dateTime .
@@ -339,26 +345,33 @@ f2n:52N_ConflationExecution20140305   prov:used  usgs:USGS_Feature1;
                                       prov:used  osm:OSM_Feature2 .
 
 # When a conflation process is run, a conflated map instance is generated by the process
-usgs_conf:ConflatedMap_Feature1  prov:wasGeneratedBy f2n:52N_ConflationExecution20140305 .
-usgs_conf:ConflatedMap_Feature2  prov:wasGeneratedBy f2n:52N_ConflationExecution20140305 .
+usgs_conf:conflated_Feature1  prov:wasGeneratedBy f2n:52N_ConflationExecution20140305 .
+usgs_conf:conflated_Feature2  prov:wasGeneratedBy f2n:52N_ConflationExecution20140305 .
 #...
 
 # The provenance of conflated maps and conflation processes can include time stamps
-usgs_conf:ConflatedMap_Feature1; prov:generatedAtTime "2014-03-05T10:20:00"^^xsd:dateTime .
-usgs_conf:ConflatedMap_Feature2; prov:generatedAtTime "2014-03-05T10:20:05"^^xsd:dateTime .
+usgs_conf:conflated_Feature1; prov:generatedAtTime "2014-03-05T10:20:00"^^xsd:dateTime .
+usgs_conf:conflated_Feature2; prov:generatedAtTime "2014-03-05T10:20:05"^^xsd:dateTime .
 #...
 
 ###################################################################
 #    Attribution the execution (who pressed the button it?)
 ###################################################################
 
-usgs_conf:ConflatedMap prov:wasAttributedTo nga:david . 
-usgs_conf:ConflatedMap_Feature1 prov:wasAttributedTo nga:david . 
-usgs_conf:ConflatedMap_Feature2 prov:wasAttributedTo nga:david . 
+usgs_conf:conflatedMap prov:wasAttributedTo nga:david . 
+usgs_conf:conflated_Feature1 prov:wasAttributedTo nga:david . 
+usgs_conf:conflated_Feature2 prov:wasAttributedTo nga:david . 
 #... 3, 4, 5...
 
 f2n:52N_ConflationExecution20140305 prov:wasAssociatedWith nga:david .
 
+f2n:52N_ConflationExecution20140305 prov:qualifiedAssociation [
+        a prov:Association;
+        prov:agent   nga:david;
+        prov:hadRole nga:davidClient
+      ] .
+	  
+	  
 ###################################################################
 #    Roles for individual executions and features.
 ###################################################################
@@ -389,16 +402,16 @@ f2n:52N_ConflationExecution20140305 prov:qualifiedUsage [
      ] .
 #... 3, 4, 5...
 
-usgs_conf:ConflatedMap_Feature1 prov:qualifiedGeneration [
+usgs_conf:conflated_Feature1 prov:qualifiedGeneration [
                      a prov:Generation ;
                      prov:activity  f2n:52N_ConflationExecution20140305 ;
-                     prov:hadRole   ows10:ConflatedMapOutput
+                     prov:hadRole   ows10:conflatedMapOutput
   ] .
 
-usgs_conf:ConflatedMap_Feature2 prov:qualifiedGeneration [
+usgs_conf:conflated_Feature2 prov:qualifiedGeneration [
                      a prov:Generation ;
                      prov:activity  f2n:52N_ConflationExecution20140305 ;
-                     prov:hadRole   ows10:ConflatedMapOutput
+                     prov:hadRole   ows10:conflatedMapOutput
   ] .
 
 #... 3, 4, 5...
@@ -435,7 +448,7 @@ f2n:52N_ConflationAlgorithm_v1 prov:wasAttributedTo f2n:benjamin .
 f2n:52N_ConflationAlgorithm_v1 prov:qualifiedAttribution [
 						a  prov:Attribution ;
 						   prov:agent    f2n:benjamin ;
-						   prov:hadRole  f2n:BenjaminDeveloper ;
+						   prov:hadRole  f2n:benjaminDeveloper ;
   ] .
 
 
@@ -449,3 +462,4 @@ f2n:52N_ConflationAlgorithm_v1 prov:qualifiedAttribution [
 <> a prov:Bundle;
         prov:wasAttributedTo f2n:Arne ;
             prov:wasGeneratedAt "2014-03-05T10:22:00"^^xsd:dateTime .
+			
